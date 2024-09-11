@@ -1,5 +1,5 @@
 {
-  "name": "tawk/widget",
+  "name": "tawk/tawk-magento-2",
   "description": "tawk.to - free live chat software for your website",
   "type": "magento2-module",
   "keywords": [
@@ -16,7 +16,7 @@
   "homepage": "https://www.tawk.to/",
   "support": {
     "email": "support@tawk.to",
-    "issues": "https://github.com/tawk/tawk-magento-2/issues"
+    "issues": "https://github.com/tawk/tawk-magento-2-package/issues"
   },
   "version": "1.6.1",
   "license": [
@@ -60,10 +60,6 @@
     "magento": {
       "type": "composer",
       "url": "https://repo.magento.com/"
-    },
-    "tawk-url-utils": {
-      "type": "vcs",
-      "url": "https://github.com/tawk/tawk-url-utils.git"
     }
   },
   "config": {
