@@ -19,6 +19,7 @@
 namespace Tawk\Widget\Block;
 
 use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
 use Magento\Customer\Model\SessionFactory;
 
 use Tawk\Modules\UrlPatternMatcher;
@@ -69,17 +70,26 @@ class Embed extends Template
     protected $modelSessionFactory;
 
     /**
+     * Escaper instance
+     *
+     * @var Escaper $escaper
+     */
+    public $escaper;
+
+    /**
      * Constructor
      *
      * @param SessionFactory $sessionFactory Session Factory instance
      * @param WidgetFactory $modelFactory Tawk.to Widget Model instance
      * @param Template\Context $context Template Context
+     * @param Escaper $escaper Escaper instance
      * @param array $data Template data
      */
     public function __construct(
         SessionFactory $sessionFactory,
         WidgetFactory $modelFactory,
         Template\Context $context,
+        Escaper $escaper,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -89,6 +99,7 @@ class Embed extends Template
         $this->model = $this->getWidgetModel();
         $this->request = $context->getRequest();
         $this->modelSessionFactory = $sessionFactory->create();
+        $this->escaper = $escaper;
     }
 
     /**
@@ -99,8 +110,8 @@ class Embed extends Template
     public function getEmbedUrl()
     {
         return 'https://embed.tawk.to'.
-            '/'.htmlspecialchars($this->model->getPageId()).
-            '/'.htmlspecialchars($this->model->getWidgetId());
+            '/'.$this->escaper->escapeHtml($this->model->getPageId()).
+            '/'.$this->escaper->escapeHtml($this->model->getWidgetId());
     }
 
     /**
