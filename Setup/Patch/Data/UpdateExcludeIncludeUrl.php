@@ -19,62 +19,82 @@ class UpdateExcludeIncludeUrl implements DataPatchInterface
      *
      * @var WidgetFactory $_modelWidgetFactory
      */
-	private $_modelWidgetFactory;
+    private $_modelWidgetFactory;
 
     /**
      * Store Manager instance
      *
      * @var StoreManagerInterface $_modelStoreManager
      */
-	private $_modelStoreManager;
+    private $_modelStoreManager;
 
     /**
-	 * Module Data Setup Interface
-	 *
+     * Module Data Setup Interface
+     *
      * @var ModuleDataSetupInterface
      */
-	 private $_moduleDataSetup;
+     private $_moduleDataSetup;
 
     /**
      * Constructor
      *
      * @param WidgetFactory $modelWidgetFactory Tawk.to Widget Model instance
      * @param StoreManagerInterface $modelStoreManager Store Manager instance
+     * @param ModuleDataSetupInterface $moduleDataSetup Module Data Setup Interface
      */
-	public function __construct(
-		WidgetFactory $modelWidgetFactory,
-		StoreManagerInterface $modelStoreManager,
-		ModuleDataSetupInterface $moduleDataSetup
-	) {
-		$this->_modelWidgetFactory = $modelWidgetFactory;
-		$this->_modelStoreManager = $modelStoreManager;
-		$this->_moduleDataSetup = $moduleDataSetup;
-	}
+    public function __construct(
+        WidgetFactory $modelWidgetFactory,
+        StoreManagerInterface $modelStoreManager,
+        ModuleDataSetupInterface $moduleDataSetup
+    ) {
+        $this->_modelWidgetFactory = $modelWidgetFactory;
+        $this->_modelStoreManager = $modelStoreManager;
+        $this->_moduleDataSetup = $moduleDataSetup;
+    }
+
+    /**
+     * Get aliases (previous names) for the patch.
+     *
+     * @return string[]
+     */
+    public function getAliases()
+    {
+        return [];
+    }
+
+    /**
+     * Get array of patches that have to be executed prior to this.
+     *
+     * @return string[]
+     */
+    public static function getDependencies()
+    {
+        return [];
+    }
 
     /**
      * Add new records with wildcards that are derived from the existing patterns.
-	 */
-	public function apply()
-	{
-		$this->_moduleDataSetup->getConnection()->startSetup();
+     */
+    public function apply()
+    {
+        $this->_moduleDataSetup->getConnection()->startSetup();
 
-		$collection = $this->_modelWidgetFactory->create()->getCollection();
+        $collection = $this->_modelWidgetFactory->create()->getCollection();
 
-		foreach ($collection as $item) {
-			$storeId = $item->getStoreId();
-			$storeHost = $this->getStoreHost($storeId);
+        foreach ($collection as $item) {
+            $storeId = $item->getStoreId();
+            $storeHost = $this->getStoreHost($storeId);
 
-			$excludePatternList = $this->addWildcardToPatternList($item->getExcludeUrl(), $storeHost);
-			$includePatternList = $this->addWildcardToPatternList($item->getIncludeUrl(), $storeHost);
+            $excludePatternList = $this->addWildcardToPatternList($item->getExcludeUrl(), $storeHost);
+            $includePatternList = $this->addWildcardToPatternList($item->getIncludeUrl(), $storeHost);
 
-			$item->setExcludeUrl($excludePatternList);
-			$item->setIncludeUrl($includePatternList);
-			$item->save();
-		}
+            $item->setExcludeUrl($excludePatternList);
+            $item->setIncludeUrl($includePatternList);
+            $item->save();
+        }
 
-		$this->_moduleDataSetup->getConnection()->endSetup();
-	}
-
+        $this->_moduleDataSetup->getConnection()->endSetup();
+    }
 
     /**
      * Retrieves store url host
@@ -87,7 +107,7 @@ class UpdateExcludeIncludeUrl implements DataPatchInterface
         $storeHost = '';
 
         $storeUrl = $this->_modelStoreManager->getStore($storeId)->getBaseUrl();
-		$parsedUrl = UriFactory::factory($storeUrl);
+        $parsedUrl = UriFactory::factory($storeUrl);
 
         if (!empty($parsedUrl->getHost())) {
             $storeHost = $parsedUrl->getHost();
