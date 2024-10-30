@@ -1,16 +1,17 @@
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
 	<table name="tawk_widget" resource="default" engine="innodb" comment="Tawk Widget table that makes connection between stores and widgets">
-		<column name="id" xsi:type="int" length="10" identity="true" unsigned="true" nullable="false" comment="Id"/>
+		<column name="id" xsi:type="int" identity="true" unsigned="true" nullable="false" comment="Id"/>
 		<constraint xsi:type="primary" referenceId="PRIMARY">
 			<column name="id"/>
 		</constraint>
-		<column name="for_store_id" xsi:type="text" length="50" comment="For store Id"/>
-		<column name="page_id" xsi:type="text" length="50" comment="Page Id"/>
-		<column name="widget_id" xsi:type="text" length="50" comment="Widget Id"/>
-		<column name="always_display" xsi:type="int" length="1" comment="always_display"/>
-		<column name="do_not_display" xsi:type="int" length="1" comment="do_not_display"/>
-		<column name="include_url" xsi:type="text" length="255" comment="include_url"/>
-		<column name="enable_visitor_recognition" xsi:type="int" length="1" nullable="false" default="1" comment="Enable visitor recognition feature"/>
+		<column name="for_store_id" xsi:type="text" comment="For store Id"/>
+		<column name="page_id" xsi:type="text" comment="Page Id"/>
+		<column name="widget_id" xsi:type="text" comment="Widget Id"/>
+		<column name="always_display" xsi:type="int" comment="always_display"/>
+		<column name="exclude_url" xsi:type="text" comment="exclude_url"/>
+		<column name="do_not_display" xsi:type="int" comment="do_not_display"/>
+		<column name="include_url" xsi:type="text" comment="include_url"/>
+		<column name="enable_visitor_recognition" xsi:type="int" nullable="false" default="1" comment="Enable visitor recognition feature"/>
 	</table>
 </schema>

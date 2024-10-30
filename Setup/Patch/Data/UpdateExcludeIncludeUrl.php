@@ -1,30 +1,38 @@
 <?php
 
-namespace Tawk\Widget\Setup;
+declare(strict_types=1);
 
-use Magento\Framework\Setup\UpgradeDataInterface;
+namespace Tawk\Widget\Setup\Patch\Data;
+
 use Magento\Framework\Setup\ModuleDataSetupInterface;
-use Magento\Framework\Setup\ModuleContextInterface;
+use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
 use Tawk\Helpers\PathHelper;
 use Tawk\Widget\Model\WidgetFactory;
 
-class UpgradeData implements UpgradeDataInterface
+class UpdateExcludeIncludeUrl implements DataPatchInterface
 {
     /**
      * Tawk.to Widget Model instance
      *
      * @var WidgetFactory $_modelWidgetFactory
      */
-    protected $_modelWidgetFactory;
+	private $_modelWidgetFactory;
 
     /**
      * Store Manager instance
      *
      * @var StoreManagerInterface $_modelStoreManager
      */
-    protected $_modelStoreManager;
+	private $_modelStoreManager;
+
+    /**
+	 * Module Data Setup Interface
+	 *
+     * @var ModuleDataSetupInterface
+     */
+	 private $_moduleDataSetup;
 
     /**
      * Constructor
@@ -32,55 +40,40 @@ class UpgradeData implements UpgradeDataInterface
      * @param WidgetFactory $modelWidgetFactory Tawk.to Widget Model instance
      * @param StoreManagerInterface $modelStoreManager Store Manager instance
      */
-    public function __construct(
-        WidgetFactory $modelWidgetFactory,
-        StoreManagerInterface $modelStoreManager
-    ) {
-        $this->_modelWidgetFactory = $modelWidgetFactory;
-        $this->_modelStoreManager = $modelStoreManager;
-    }
+	public function __construct(
+		WidgetFactory $modelWidgetFactory,
+		StoreManagerInterface $modelStoreManager,
+		ModuleDataSetupInterface $moduleDataSetup
+	) {
+		$this->_modelWidgetFactory = $modelWidgetFactory;
+		$this->_modelStoreManager = $modelStoreManager;
+		$this->_moduleDataSetup = $moduleDataSetup;
+	}
 
     /**
-     * Upgrade runner
-     *
-     * @param ModuleDataSetupInterface $setup Module Data Setup instance
-     * @param ModuleContextInterface $context Module Context Setup instance
-     * @return void
-     */
-    public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
-    {
-        $setup->startSetup();
-        $this->versionUpdate160($setup, $context);
-        $setup->endSetup();
-    }
-
-    /**
-     * Upgrade script for version 1.6.0
-     *
      * Add new records with wildcards that are derived from the existing patterns.
-     *
-     * @param [type] $setup
-     * @param [type] $context
-     * @return void
-     */
-    private function versionUpdate160($setup, $context)
-    {
-        if (version_compare($context->getVersion(), '1.6.0', '<')) {
-            // get all stores and groups
-            $collection = $this->_modelWidgetFactory->create()->getCollection();
+	 */
+	public function apply()
+	{
+        $this->_moduleDataSetup->getConnection()->startSetup();
 
-            foreach ($collection as $item) {
-                $storeId = $item->getForStoreId();
-                $storeHost = $this->getStoreHost($storeId);
-                $excludePatternList = $this->addWildcardToPatternList($item->getExcludeUrl(), $storeHost);
-                $includePatternList = $this->addWildcardToPatternList($item->getIncludeUrl(), $storeHost);
+		$collection = $this->_modelWidgetFactory->create()->getCollection();
 
-                $item->setExcludeUrl($excludePatternList);
-                $item->setIncludeUrl($includePatternList);
-                $item->save();
-            }
-        }
-    }
+		foreach ($collection as $item) {
+			$storeId = $item->getStoreId();
+			$storeHost = $this->getStoreHost($storeId);
+
+			$excludePatternList = $this->addWildcardToPatternList($item->getExcludeUrl(), $storeHost);
+			$includePatternList = $this->addWildcardToPatternList($item->getIncludeUrl(), $storeHost);
+
+			$item->setExcludeUrl($excludePatternList);
+			$item->setIncludeUrl($includePatternList);
+			$item->save();
+		}
+
+        $this->_moduleDataSetup->getConnection()->endSetup();
+	}
+
 
     /**
      * Retrieves store url host
