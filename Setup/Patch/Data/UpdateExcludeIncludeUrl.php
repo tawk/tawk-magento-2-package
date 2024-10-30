@@ -7,6 +7,7 @@ namespace Tawk\Widget\Setup\Patch\Data;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Laminas\Uri\UriFactory;
 
 use Tawk\Helpers\PathHelper;
 use Tawk\Widget\Model\WidgetFactory;
@@ -55,7 +56,7 @@ class UpdateExcludeIncludeUrl implements DataPatchInterface
 	 */
 	public function apply()
 	{
-        $this->_moduleDataSetup->getConnection()->startSetup();
+		$this->_moduleDataSetup->getConnection()->startSetup();
 
 		$collection = $this->_modelWidgetFactory->create()->getCollection();
 
@@ -71,7 +72,7 @@ class UpdateExcludeIncludeUrl implements DataPatchInterface
 			$item->save();
 		}
 
-        $this->_moduleDataSetup->getConnection()->endSetup();
+		$this->_moduleDataSetup->getConnection()->endSetup();
 	}
 
 
@@ -86,15 +87,14 @@ class UpdateExcludeIncludeUrl implements DataPatchInterface
         $storeHost = '';
 
         $storeUrl = $this->_modelStoreManager->getStore($storeId)->getBaseUrl();
-        //phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
-        $parsedUrl = parse_url($storeUrl);
+		$parsedUrl = UriFactory::factory($storeUrl);
 
-        if (!empty($parsedUrl['host'])) {
-            $storeHost = $parsedUrl['host'];
+        if (!empty($parsedUrl->getHost())) {
+            $storeHost = $parsedUrl->getHost();
         }
 
-        if (!empty($parsedUrl['port'])) {
-            $storeHost .= ':' . $parsedUrl['port'];
+        if (!empty($parsedUrl->getPort())) {
+            $storeHost .= ':' . $parsedUrl->getPort();
         }
 
         return $storeHost;
