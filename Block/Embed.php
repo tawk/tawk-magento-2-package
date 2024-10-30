@@ -110,8 +110,8 @@ class Embed extends Template
     public function getEmbedUrl()
     {
         return 'https://embed.tawk.to'.
-            '/'.$this->escaper->escapeHtml($this->model->getPageId()).
-            '/'.$this->escaper->escapeHtml($this->model->getWidgetId());
+            '/'.$this->escaper->escapeUrl($this->model->getPageId()).
+            '/'.$this->escaper->escapeUrl($this->model->getWidgetId());
     }
 
     /**
