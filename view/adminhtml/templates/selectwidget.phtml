@@ -20,13 +20,13 @@
     {
         "*": {
             "tawk-widget-select" : {
-                "domain" : "<?= $block->escaper->escapeUrl($block->mainurl()) ?>",
-                "baseUrl" : "<?= $block->escaper->escapeUrl($block->getBaseUrl()) ?>",
-                "storedWidgetUrl" : "<?= $block->escaper->escapeUrl($block->getStoreWidget()) ?>",
-                "removeWidgetUrl" : "<?= $block->escaper->escapeUrl($block->getRemoveUrl()) ?>",
+                "domain" : "<?= $block->escaperEscapeUrl($block->mainurl()) ?>",
+                "baseUrl" : "<?= $block->escaperEscapeUrl($block->getBaseUrl()) ?>",
+                "storedWidgetUrl" : "<?= $block->escaperEscapeUrl($block->getStoreWidget()) ?>",
+                "removeWidgetUrl" : "<?= $block->escaperEscapeUrl($block->getRemoveUrl()) ?>",
                 "form" : {
-                    "key" : "<?= $block->escaper->escapeJs($block->getFormKey()) ?>",
-                    "action" : "<?= $block->escaper->escapeUrl($block->getFormAction()) ?>"
+                    "key" : "<?= $block->escaperEscapeJs($block->getFormKey()) ?>",
+                    "action" : "<?= $block->escaperEscapeUrl($block->getFormAction()) ?>"
                 }
             }
         }
@@ -41,7 +41,7 @@
 <iframe
     id="tawk_widget_customization"
     style="border:none; width:100%; margin: 0; padding: 0; margin-top: 24px; min-height: 300px"
-    src="<?= $block->escaper->escapeUrl($block->getIframeUrl()) ?>">
+    src="<?= $block->escaperEscapeUrl($block->getIframeUrl()) ?>">
 </iframe>
 
 <div id="visibility_options">
