@@ -5,13 +5,18 @@ xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/et
 		<constraint xsi:type="primary" referenceId="PRIMARY">
 			<column name="id"/>
 		</constraint>
-		<column name="for_store_id" xsi:type="text" comment="For store Id"/>
-		<column name="page_id" xsi:type="text" comment="Page Id"/>
-		<column name="widget_id" xsi:type="text" comment="Widget Id"/>
-		<column name="always_display" xsi:type="int" comment="always_display"/>
-		<column name="exclude_url" xsi:type="text" comment="exclude_url"/>
-		<column name="do_not_display" xsi:type="int" comment="do_not_display"/>
-		<column name="include_url" xsi:type="text" comment="include_url"/>
-		<column name="enable_visitor_recognition" xsi:type="int" nullable="false" default="1" comment="Enable visitor recognition feature"/>
+		<column name="for_store_id" xsi:type="int" unsigned="true" nullable="false" comment="Store View ID"/>
+		<column name="page_id" xsi:type="varchar" length="255" nullable="true" comment="Tawk.to Page ID"/>
+		<column name="widget_id" xsi:type="varchar" length="255" nullable="true" comment="Tawk.to Widget ID"/>
+		<column name="always_display" xsi:type="smallint" unsigned="true" nullable="false" default="0"
+			comment="Flag to always display widget"/>
+		<column name="exclude_url" xsi:type="text" length="65535" nullable="true"
+			comment="Comma-separated list of url patterns where widget should not be displayed"/>
+		<column name="do_not_display" xsi:type="smallint" unsigned="true" nullable="false" default="0"
+			comment="Flag to disable widget display"/>
+		<column name="include_url" xsi:type="text" length="65535" nullable="true"
+			comment="Comma-separated list of url patterns where widget should be displayed"/>
+		<column name="enable_visitor_recognition" xsi:type="smallint" unsigned="true" nullable="false" default="1"
+			comment="Enable visitor recognition feature"/>
 	</table>
 </schema>
