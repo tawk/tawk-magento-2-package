@@ -238,24 +238,4 @@ class Embed extends Template
             return '';
         }
     }
-
-    /**
-     * Escapes URL
-     *
-     * @param string $url URL to escape
-     */
-    public function escaperEscapeUrl($url)
-    {
-        return $this->escaper->escapeUrl($url);
-    }
-
-    /**
-     * Escapes JavaScript
-     *
-     * @param string $js JavaScript to escape
-     */
-    public function escaperEscapeJs($js)
-    {
-        return $this->escaper->escapeJs($js);
-    }
 }

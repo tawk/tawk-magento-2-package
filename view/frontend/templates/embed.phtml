@@ -23,7 +23,7 @@
 {
     "*": {
         "tawk-embed" : {
-            "embedUrl" : "<?= $block->escaperEscapeUrl($block->getEmbedUrl()); ?>"
+            "embedUrl" : "<?= $escaper->escapeUrl($block->getEmbedUrl()); ?>"
         }
     }
 }
@@ -31,10 +31,10 @@
 {
     "*": {
         "tawk-embed" : {
-            "embedUrl" : "<?= $block->escaperEscapeUrl($block->getEmbedUrl()); ?>",
+            "embedUrl" : "<?= $escaper->escapeUrl($block->getEmbedUrl()); ?>",
             "visitor" : {
-                "name" : "<?=  $block->escaperEscapeJs($customer_details['name']); ?>",
-                "email" : "<?= $block->escaperEscapeJs($customer_details['email']); ?>"
+                "name" : "<?=  $escaper->escapeJs($customer_details['name']); ?>",
+                "email" : "<?= $escaper->escapeJs($customer_details['email']); ?>"
             }
         }
     }

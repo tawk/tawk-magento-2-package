@@ -18,7 +18,6 @@
 
 namespace Tawk\Widget\Block\Adminhtml;
 
-use Magento\Framework\Escaper;
 use Magento\Backend\Block\Template;
 use Tawk\Widget\Model\WidgetFactory;
 
@@ -53,31 +52,21 @@ class SelectWidgetBlock extends Template
     private static $validPatternList;
 
     /**
-     * Escaper instance
-     *
-     * @var Escaper $escaper
-     */
-    protected $escaper;
-
-    /**
      * Constructor
      *
      * @param Template\Context $context Template context
      * @param WidgetFactory $modelFactory Tawk.to Widget Model instance
-     * @param Escaper $escaper Escaper instance
      * @param array $data Template data
      */
     public function __construct(
         Template\Context $context,
         WidgetFactory $modelFactory,
-        Escaper $escaper,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->logger  = $context->getLogger();
         $this->modelWidgetFactory = $modelFactory;
         $this->request = $context->getRequest();
-        $this->escaper = $escaper;
     }
 
     /**
@@ -269,25 +258,5 @@ class SelectWidgetBlock extends Template
         }
 
         return [];
-    }
-
-    /**
-     * Escapes URL
-     *
-     * @param string $url URL to escape
-     */
-    public function escaperEscapeUrl($url)
-    {
-        return $this->escaper->escapeUrl($url);
-    }
-
-    /**
-     * Escapes JavaScript
-     *
-     * @param string $js JavaScript to escape
-     */
-    public function escaperEscapeJs($js)
-    {
-        return $this->escaper->escapeJs($js);
     }
 }
