@@ -58,8 +58,11 @@ class SelectWidgetBlock extends Template
      * @param WidgetFactory $modelFactory Tawk.to Widget Model instance
      * @param array $data Template data
      */
-    public function __construct(Template\Context $context, WidgetFactory $modelFactory, array $data = [])
-    {
+    public function __construct(
+        Template\Context $context,
+        WidgetFactory $modelFactory,
+        array $data = []
+    ) {
         parent::__construct($context, $data);
         $this->logger  = $context->getLogger();
         $this->modelWidgetFactory = $modelFactory;

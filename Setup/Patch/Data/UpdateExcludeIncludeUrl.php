@@ -1,85 +1,99 @@
 <?php
 
-namespace Tawk\Widget\Setup;
+declare(strict_types=1);
 
-use Magento\Framework\Setup\UpgradeDataInterface;
+namespace Tawk\Widget\Setup\Patch\Data;
+
 use Magento\Framework\Setup\ModuleDataSetupInterface;
-use Magento\Framework\Setup\ModuleContextInterface;
+use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Laminas\Uri\UriFactory;
 
 use Tawk\Helpers\PathHelper;
 use Tawk\Widget\Model\WidgetFactory;
 
-class UpgradeData implements UpgradeDataInterface
+class UpdateExcludeIncludeUrl implements DataPatchInterface
 {
     /**
      * Tawk.to Widget Model instance
      *
      * @var WidgetFactory $_modelWidgetFactory
      */
-    protected $_modelWidgetFactory;
+    private $_modelWidgetFactory;
 
     /**
      * Store Manager instance
      *
      * @var StoreManagerInterface $_modelStoreManager
      */
-    protected $_modelStoreManager;
+    private $_modelStoreManager;
+
+    /**
+     * Module Data Setup Interface
+     *
+     * @var ModuleDataSetupInterface
+     */
+     private $_moduleDataSetup;
 
     /**
      * Constructor
      *
      * @param WidgetFactory $modelWidgetFactory Tawk.to Widget Model instance
      * @param StoreManagerInterface $modelStoreManager Store Manager instance
+     * @param ModuleDataSetupInterface $moduleDataSetup Module Data Setup Interface
      */
     public function __construct(
         WidgetFactory $modelWidgetFactory,
-        StoreManagerInterface $modelStoreManager
+        StoreManagerInterface $modelStoreManager,
+        ModuleDataSetupInterface $moduleDataSetup
     ) {
         $this->_modelWidgetFactory = $modelWidgetFactory;
         $this->_modelStoreManager = $modelStoreManager;
+        $this->_moduleDataSetup = $moduleDataSetup;
     }
 
     /**
-     * Upgrade runner
+     * Get aliases (previous names) for the patch.
      *
-     * @param ModuleDataSetupInterface $setup Module Data Setup instance
-     * @param ModuleContextInterface $context Module Context Setup instance
-     * @return void
+     * @return string[]
      */
-    public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
+    public function getAliases()
     {
-        $setup->startSetup();
-        $this->versionUpdate160($setup, $context);
-        $setup->endSetup();
+        return [];
     }
 
     /**
-     * Upgrade script for version 1.6.0
+     * Get array of patches that have to be executed prior to this.
      *
+     * @return string[]
+     */
+    public static function getDependencies()
+    {
+        return [];
+    }
+
+    /**
      * Add new records with wildcards that are derived from the existing patterns.
-     *
-     * @param [type] $setup
-     * @param [type] $context
-     * @return void
      */
-    private function versionUpdate160($setup, $context)
+    public function apply()
     {
-        if (version_compare($context->getVersion(), '1.6.0', '<')) {
-            // get all stores and groups
-            $collection = $this->_modelWidgetFactory->create()->getCollection();
+        $this->_moduleDataSetup->getConnection()->startSetup();
 
-            foreach ($collection as $item) {
-                $storeId = $item->getForStoreId();
-                $storeHost = $this->getStoreHost($storeId);
-                $excludePatternList = $this->addWildcardToPatternList($item->getExcludeUrl(), $storeHost);
-                $includePatternList = $this->addWildcardToPatternList($item->getIncludeUrl(), $storeHost);
+        $collection = $this->_modelWidgetFactory->create()->getCollection();
 
-                $item->setExcludeUrl($excludePatternList);
-                $item->setIncludeUrl($includePatternList);
-                $item->save();
-            }
+        foreach ($collection as $item) {
+            $storeId = $item->getStoreId();
+            $storeHost = $this->getStoreHost($storeId);
+
+            $excludePatternList = $this->addWildcardToPatternList($item->getExcludeUrl(), $storeHost);
+            $includePatternList = $this->addWildcardToPatternList($item->getIncludeUrl(), $storeHost);
+
+            $item->setExcludeUrl($excludePatternList);
+            $item->setIncludeUrl($includePatternList);
+            $item->save();
         }
+
+        $this->_moduleDataSetup->getConnection()->endSetup();
     }
 
     /**
@@ -93,15 +107,14 @@ class UpgradeData implements UpgradeDataInterface
         $storeHost = '';
 
         $storeUrl = $this->_modelStoreManager->getStore($storeId)->getBaseUrl();
-        //phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
-        $parsedUrl = parse_url($storeUrl);
+        $parsedUrl = UriFactory::factory($storeUrl);
 
-        if (!empty($parsedUrl['host'])) {
-            $storeHost = $parsedUrl['host'];
+        if (!empty($parsedUrl->getHost())) {
+            $storeHost = $parsedUrl->getHost();
         }
 
-        if (!empty($parsedUrl['port'])) {
-            $storeHost .= ':' . $parsedUrl['port'];
+        if (!empty($parsedUrl->getPort())) {
+            $storeHost .= ':' . $parsedUrl->getPort();
         }
 
         return $storeHost;

@@ -20,13 +20,13 @@
     {
         "*": {
             "tawk-widget-select" : {
-                "domain" : "<?= $block->escapeUrl($block->mainurl()) ?>",
-                "baseUrl" : "<?= $block->escapeUrl($block->getBaseUrl()) ?>",
-                "storedWidgetUrl" : "<?= $block->escapeUrl($block->getStoreWidget()) ?>",
-                "removeWidgetUrl" : "<?= $block->escapeUrl($block->getRemoveUrl()) ?>",
+                "domain" : "<?= $escaper->escapeUrl($block->mainurl()) ?>",
+                "baseUrl" : "<?= $escaper->escapeUrl($block->getBaseUrl()) ?>",
+                "storedWidgetUrl" : "<?= $escaper->escapeUrl($block->getStoreWidget()) ?>",
+                "removeWidgetUrl" : "<?= $escaper->escapeUrl($block->getRemoveUrl()) ?>",
                 "form" : {
-                    "key" : "<?= $block->escapeJs($block->getFormKey()) ?>",
-                    "action" : "<?= $block->escapeUrl($block->getFormAction()) ?>"
+                    "key" : "<?= $escaper->escapeJs($block->getFormKey()) ?>",
+                    "action" : "<?= $escaper->escapeUrl($block->getFormAction()) ?>"
                 }
             }
         }
@@ -41,7 +41,7 @@
 <iframe
     id="tawk_widget_customization"
     style="border:none; width:100%; margin: 0; padding: 0; margin-top: 24px; min-height: 300px"
-    src="<?= $block->escapeUrl($block->getIframeUrl()) ?>">
+    src="<?= $escaper->escapeUrl($block->getIframeUrl()) ?>">
 </iframe>
 
 <div id="visibility_options">

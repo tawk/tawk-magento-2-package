@@ -1,0 +1,22 @@
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+	<table name="tawk_widget" resource="default" engine="innodb" comment="Tawk Widget table that makes connection between stores and widgets">
+		<column name="id" xsi:type="int" identity="true" unsigned="true" nullable="false" comment="Id"/>
+		<constraint xsi:type="primary" referenceId="PRIMARY">
+			<column name="id"/>
+		</constraint>
+		<column name="for_store_id" xsi:type="int" unsigned="true" nullable="false" comment="Store View ID"/>
+		<column name="page_id" xsi:type="varchar" length="255" nullable="true" comment="Tawk.to Page ID"/>
+		<column name="widget_id" xsi:type="varchar" length="255" nullable="true" comment="Tawk.to Widget ID"/>
+		<column name="always_display" xsi:type="smallint" unsigned="true" nullable="false" default="0"
+			comment="Flag to always display widget"/>
+		<column name="exclude_url" xsi:type="text" nullable="true"
+			comment="Comma-separated list of url patterns where widget should not be displayed"/>
+		<column name="do_not_display" xsi:type="smallint" unsigned="true" nullable="false" default="0"
+			comment="Flag to disable widget display"/>
+		<column name="include_url" xsi:type="text" nullable="true"
+			comment="Comma-separated list of url patterns where widget should be displayed"/>
+		<column name="enable_visitor_recognition" xsi:type="smallint" unsigned="true" nullable="false" default="1"
+			comment="Enable visitor recognition feature"/>
+	</table>
+</schema>
