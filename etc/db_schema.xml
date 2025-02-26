@@ -18,5 +18,6 @@ xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/et
 			comment="Comma-separated list of url patterns where widget should be displayed"/>
 		<column name="enable_visitor_recognition" xsi:type="smallint" unsigned="true" nullable="false" default="1"
 			comment="Enable visitor recognition feature"/>
+		<column name="js_api_key" xsi:type="text" nullable="true" comment="JS API key"/>
 	</table>
 </schema>

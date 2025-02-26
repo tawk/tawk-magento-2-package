@@ -43,6 +43,7 @@ define(['jquery', 'jquery/ui'], function ($) {
                 }
 
                 jQuery('#enable_visitor_recognition').prop('checked', response.enableVisitorRecognition === '1');
+                jQuery('#js_api_key').val(response.jsApiKey);
             });
         }
 
@@ -62,9 +63,12 @@ define(['jquery', 'jquery/ui'], function ($) {
                 alwaysdisplay : alwaysdisplayvalue,
                 donotdisplay: donotdisplayvalue,
                 enableVisitorRecognition : jQuery('#enable_visitor_recognition').is(':checked') ? 1 : 0,
+                jsApiKey: jQuery('#js_api_key').val(),
                 form_key : formKey
-            }, function () {
-                e.source.postMessage({action : 'setDone'}, baseUrl);
+            }, function (response) {
+                if (response.success) {
+                    e.source.postMessage({action : 'setDone'}, baseUrl);
+                }
             });
         }
 
@@ -91,6 +95,7 @@ define(['jquery', 'jquery/ui'], function ($) {
                 alwaysdisplay : alwaysdisplayvalue,
                 donotdisplay: donotdisplayvalue,
                 enableVisitorRecognition : jQuery('#enable_visitor_recognition').is(':checked') ? 1 : 0,
+                jsApiKey: jQuery('#js_api_key').val(),
                 form_key : formKey
             }, function (response) {
                 if (response.success) {
