@@ -34,7 +34,8 @@
             "embedUrl" : "<?= $escaper->escapeUrl($block->getEmbedUrl()); ?>",
             "visitor" : {
                 "name" : "<?=  $escaper->escapeJs($customer_details['name']); ?>",
-                "email" : "<?= $escaper->escapeJs($customer_details['email']); ?>"
+                "email" : "<?= $escaper->escapeJs($customer_details['email']); ?>",
+                "hash" : "<?= $escaper->escapeJs($customer_details['hash']); ?>"
             }
         }
     }

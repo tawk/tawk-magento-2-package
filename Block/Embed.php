@@ -21,12 +21,16 @@ namespace Tawk\Widget\Block;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\Escaper;
 use Magento\Customer\Model\SessionFactory;
+use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Exception\LocalizedException;
 
 use Tawk\Modules\UrlPatternMatcher;
 use Tawk\Widget\Model\WidgetFactory;
 
 class Embed extends Template
 {
+    public const TAWKTO_JS_API_KEY = 'TAWKTO_JS_API_KEY';
+
     /**
      * Tawk.to Widget Model instance
      *
@@ -77,12 +81,20 @@ class Embed extends Template
     protected $escaper;
 
     /**
+     * Encryptor instance
+     *
+     * @var EncryptorInterface $encryptor
+     */
+    protected $encryptor;
+
+    /**
      * Constructor
      *
      * @param SessionFactory $sessionFactory Session Factory instance
      * @param WidgetFactory $modelFactory Tawk.to Widget Model instance
      * @param Template\Context $context Template Context
      * @param Escaper $escaper Escaper instance
+     * @param EncryptorInterface $encryptor Encryptor instance
      * @param array $data Template data
      */
     public function __construct(
@@ -90,6 +102,7 @@ class Embed extends Template
         WidgetFactory $modelFactory,
         Template\Context $context,
         Escaper $escaper,
+        EncryptorInterface $encryptor,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -100,6 +113,7 @@ class Embed extends Template
         $this->request = $context->getRequest();
         $this->modelSessionFactory = $sessionFactory->create();
         $this->escaper = $escaper;
+        $this->encryptor = $encryptor;
     }
 
     /**
@@ -146,7 +160,8 @@ class Embed extends Template
      *
      * @return array {
      *   name: string,
-     *   email: string
+     *   email: string,
+     *   hash: string
      * }
      */
     public function getCurrentCustomerDetails()
@@ -160,10 +175,43 @@ class Embed extends Template
         }
 
         $customerSession = $this->modelSessionFactory->getCustomer();
+
+        try {
+            $jsApiKey = $this->decryptJsApiKey($this->model->getJsApiKey());
+            $hash = hash_hmac('sha256', $customerSession->getEmail(), $jsApiKey);
+        } catch (\Exception $e) {
+            $hash = '';
+        }
+
         return [
             'name'  => $customerSession->getName(),
-            'email' => $customerSession->getEmail()
+            'email' => $customerSession->getEmail(),
+            'hash' => $hash
         ];
+    }
+
+    /**
+     * Retrieve JS API key
+     *
+     * @param string $js_api_key Encrypted JS API key
+     * @return string
+     * @throws \Exception error retrieving JS API key
+     */
+    private function decryptJsApiKey(string $js_api_key)
+    {
+        if (empty($js_api_key)) {
+            throw new LocalizedException(__('JS API key is empty'));
+        }
+
+        if ($this->modelSessionFactory->hasData(self::TAWKTO_JS_API_KEY)) {
+            return $this->modelSessionFactory->getData(self::TAWKTO_JS_API_KEY);
+        }
+
+        $key = $this->encryptor->decrypt($js_api_key);
+
+        $this->modelSessionFactory->setData(self::TAWKTO_JS_API_KEY, $key);
+
+        return $key;
     }
 
     /**
