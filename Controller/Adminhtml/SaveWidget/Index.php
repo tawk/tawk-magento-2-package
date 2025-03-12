@@ -155,6 +155,8 @@ class Index extends \Magento\Backend\App\Action
             return $response->setData(['success' => false, 'message' => $e->getMessage()]);
         }
 
+        $model->setConfigVersion($model->getConfigVersion() + 1);
+
         $model->save();
 
         return $response->setData(['success' => true]);

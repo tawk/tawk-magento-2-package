@@ -5,6 +5,7 @@ xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/et
 		<constraint xsi:type="primary" referenceId="PRIMARY">
 			<column name="id"/>
 		</constraint>
+		<column name="config_version" xsi:type="int" unsigned="true" nullable="false" default="0" comment="Config version"/>
 		<column name="for_store_id" xsi:type="int" unsigned="true" nullable="false" comment="Store View ID"/>
 		<column name="page_id" xsi:type="varchar" length="255" nullable="true" comment="Tawk.to Page ID"/>
 		<column name="widget_id" xsi:type="varchar" length="255" nullable="true" comment="Tawk.to Widget ID"/>
