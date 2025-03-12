@@ -29,7 +29,7 @@ use Tawk\Widget\Model\WidgetFactory;
 
 class Embed extends Template
 {
-    public const TAWKTO_JS_API_KEY = 'TAWKTO_JS_API_KEY';
+    public const TAWKTO_VISITOR_SESSION = 'TAWKTO_VISITOR_SESSION';
 
     /**
      * Tawk.to Widget Model instance
@@ -176,18 +176,50 @@ class Embed extends Template
 
         $customerSession = $this->modelSessionFactory->getCustomer();
 
-        try {
-            $jsApiKey = $this->decryptJsApiKey($this->model->getJsApiKey());
-            $hash = hash_hmac('sha256', $customerSession->getEmail(), $jsApiKey);
-        } catch (\Exception $e) {
-            $hash = '';
-        }
+        $hash = $this->getVisitorHash($customerSession->getEmail());
 
         return [
             'name'  => $customerSession->getName(),
             'email' => $customerSession->getEmail(),
             'hash' => $hash
         ];
+    }
+
+    /**
+     * Get visitor hash
+     *
+     * @param string $email Visitor email
+     * @return string
+     */
+    private function getVisitorHash(string $email)
+    {
+        $configVersion = $this->model->getConfigVersion();
+
+        if ($this->modelSessionFactory->hasData(self::TAWKTO_VISITOR_SESSION)) {
+            $currentSession = $this->modelSessionFactory->getData(self::TAWKTO_VISITOR_SESSION);
+
+            if (isset($currentSession['hash']) &&
+                $currentSession['email'] === $email &&
+                $currentSession['config_version'] === $configVersion) {
+                return $currentSession['hash'];
+            }
+        }
+
+        try {
+            $jsApiKey = $this->decryptJsApiKey($this->model->getJsApiKey());
+        } catch (LocalizedException $e) {
+            return '';
+        }
+
+        $hash = hash_hmac('sha256', $email, $jsApiKey);
+
+        $this->modelSessionFactory->setData(self::TAWKTO_VISITOR_SESSION, [
+            'hash' => $hash,
+            'email' => $email,
+            'config_version' => $configVersion,
+        ]);
+
+        return $hash;
     }
 
     /**
@@ -203,13 +235,7 @@ class Embed extends Template
             throw new LocalizedException(__('JS API key is empty'));
         }
 
-        if ($this->modelSessionFactory->hasData(self::TAWKTO_JS_API_KEY)) {
-            return $this->modelSessionFactory->getData(self::TAWKTO_JS_API_KEY);
-        }
-
         $key = $this->encryptor->decrypt($js_api_key);
-
-        $this->modelSessionFactory->setData(self::TAWKTO_JS_API_KEY, $key);
 
         return $key;
     }
