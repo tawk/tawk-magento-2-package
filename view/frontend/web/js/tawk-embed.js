@@ -14,10 +14,10 @@ define([], function () {
                 name : visitor.name,
                 email : visitor.email
             };
-        }
 
-        if (visitor.hash) {
-            window.Tawk_API.visitor.hash = visitor.hash;
+            if (visitor.hash) {
+                window.Tawk_API.visitor.hash = visitor.hash;
+            }
         }
 
         (function () {
