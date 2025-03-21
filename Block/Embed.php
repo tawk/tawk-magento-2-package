@@ -198,6 +198,12 @@ class Embed extends Template
      */
     private function getVisitorHash(string $email)
     {
+        $encryptedJsApiKey = $this->model->getJsApiKey();
+
+        if (empty($encryptedJsApiKey)) {
+            return null;
+        }
+
         $configVersion = $this->model->getConfigVersion();
 
         if ($this->modelSessionFactory->hasData(self::TAWKTO_VISITOR_SESSION)) {
@@ -208,12 +214,6 @@ class Embed extends Template
                 $currentSession['config_version'] === $configVersion) {
                 return $currentSession['hash'];
             }
-        }
-
-        $encryptedJsApiKey = $this->model->getJsApiKey();
-
-        if (empty($encryptedJsApiKey)) {
-            return null;
         }
 
         $jsApiKey = $this->encryptor->decrypt($encryptedJsApiKey);
