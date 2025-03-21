@@ -11,6 +11,7 @@ cp -r ./Controller ./tmp/tawkmagento2
 cp -r ./Block ./tmp/tawkmagento2
 cp -r ./Helper ./tmp/tawkmagento2
 cp -r ./Api ./tmp/tawkmagento2
+cp -r ./Exception ./tmp/tawkmagento2
 cp ./registration.php ./tmp/tawkmagento2
 cp ./composer.json ./tmp/tawkmagento2
 cp README.md ./tmp/tawkmagento2

@@ -27,6 +27,7 @@ use Psr\Log\LoggerInterface;
 use Tawk\Widget\Model\WidgetFactory;
 use Tawk\Widget\Helper\StringUtil;
 use Tawk\Widget\Api\ConfigInterface;
+use Tawk\Widget\Exception\SaveWidgetException;
 
 class Index extends \Magento\Backend\App\Action
 {
@@ -151,8 +152,12 @@ class Index extends \Magento\Backend\App\Action
 
         try {
             $this->setJsApiKey($model, $jsApiKey);
-        } catch (\Exception $e) {
-            return $response->setData(['success' => false, 'message' => $e->getMessage()]);
+        } catch (LocalizedException $e) {
+            if ($e instanceof SaveWidgetException) {
+                return $response->setData(['success' => false, 'message' => $e->getMessage()]);
+            }
+
+            return $response->setData(['success' => false, 'message' => 'An error occurred while saving the widget']);
         }
 
         $model->setConfigVersion($model->getConfigVersion() + 1);
@@ -179,8 +184,10 @@ class Index extends \Magento\Backend\App\Action
             return $model->setJsApiKey(null);
         }
 
-        if (strlen(trim($jsApiKey)) !== 40) {
-            throw new LocalizedException(__('Invalid API key. Please provide value with 40 characters'));
+        $jsApiKey = trim($jsApiKey);
+
+        if (strlen($jsApiKey) !== 40) {
+            throw new SaveWidgetException(__('Invalid API key'));
         }
 
         return $model->setJsApiKey($this->encryptor->encrypt($jsApiKey));

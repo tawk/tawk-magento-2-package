@@ -68,6 +68,8 @@ define(['jquery', 'jquery/ui'], function ($) {
             }, function (response) {
                 if (response.success) {
                     e.source.postMessage({action : 'setDone'}, baseUrl);
+                } else {
+                    e.source.postMessage({action : 'setFail'}, baseUrl);
                 }
             });
         }
