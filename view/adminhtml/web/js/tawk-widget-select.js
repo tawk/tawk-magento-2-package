@@ -5,11 +5,11 @@ define(['jquery', 'jquery/ui'], function ($) {
 
     return function (config) {
         var domain = config.domain,
-        baseUrl = config.baseUrl,
-        removeWidgetUrl = config.removeWidgetUrl,
-        storedWidgetUrl = config.storedWidgetUrl,
-        formAction = config.form.action,
-        formKey = config.form.key;
+            baseUrl = config.baseUrl,
+            removeWidgetUrl = config.removeWidgetUrl,
+            storedWidgetUrl = config.storedWidgetUrl,
+            formAction = config.form.action,
+            formKey = config.form.key;
 
         function displayWidget(websiteId) {
             jQuery.get(storedWidgetUrl + '?id=' + websiteId, function (response) {
@@ -43,15 +43,16 @@ define(['jquery', 'jquery/ui'], function ($) {
                 }
 
                 jQuery('#enable_visitor_recognition').prop('checked', response.enableVisitorRecognition === '1');
+                jQuery('#js_api_key').val(response.jsApiKey);
             });
         }
 
         function setWidget(e) {
             var alwaysdisplay = jQuery('#alwaysdisplay').is(':checked'),
-            alwaysdisplayvalue = alwaysdisplay ? 1 : 0,
+                alwaysdisplayvalue = alwaysdisplay ? 1 : 0,
 
-            donotdisplay = jQuery('#donotdisplay').is(':checked'),
-            donotdisplayvalue = donotdisplay ? 1 : 0;
+                donotdisplay = jQuery('#donotdisplay').is(':checked'),
+                donotdisplayvalue = donotdisplay ? 1 : 0;
 
             jQuery.post(formAction, {
                 pageId   : e.data.pageId,
@@ -62,9 +63,14 @@ define(['jquery', 'jquery/ui'], function ($) {
                 alwaysdisplay : alwaysdisplayvalue,
                 donotdisplay: donotdisplayvalue,
                 enableVisitorRecognition : jQuery('#enable_visitor_recognition').is(':checked') ? 1 : 0,
+                jsApiKey: jQuery('#js_api_key').val(),
                 form_key : formKey
-            }, function () {
-                e.source.postMessage({action : 'setDone'}, baseUrl);
+            }, function (response) {
+                if (response.success) {
+                    e.source.postMessage({action : 'setDone'}, baseUrl);
+                } else {
+                    e.source.postMessage({action : 'setFail'}, baseUrl);
+                }
             });
         }
 
@@ -76,9 +82,9 @@ define(['jquery', 'jquery/ui'], function ($) {
 
         function saveVisibilityOptions(e) {
             var alwaysdisplay = jQuery('#alwaysdisplay').is(':checked'),
-            alwaysdisplayvalue = alwaysdisplay ? 1 : 0,
-            donotdisplay = jQuery('#donotdisplay').is(':checked'),
-            donotdisplayvalue = donotdisplay ? 1 : 0;
+                alwaysdisplayvalue = alwaysdisplay ? 1 : 0,
+                donotdisplay = jQuery('#donotdisplay').is(':checked'),
+                donotdisplayvalue = donotdisplay ? 1 : 0;
 
             e.preventDefault();
 
@@ -91,11 +97,14 @@ define(['jquery', 'jquery/ui'], function ($) {
                 alwaysdisplay : alwaysdisplayvalue,
                 donotdisplay: donotdisplayvalue,
                 enableVisitorRecognition : jQuery('#enable_visitor_recognition').is(':checked') ? 1 : 0,
+                jsApiKey: jQuery('#js_api_key').val(),
                 form_key : formKey
-            }, function () {
-                /* TODO: convert this to a different type of alert that doesn't use the browser alert func */
-                /* eslint-disable-next-line no-alert */
-                alert('Visibility options Saved');
+            }, function (response) {
+                if (response.success) {
+                    jQuery('#optionsSuccessMessage').toggle().delay(3000).fadeOut();
+                } else {
+                    jQuery('#optionsFailureMessage').text(response.message).toggle().delay(3000).fadeOut();
+                }
             });
         }
 

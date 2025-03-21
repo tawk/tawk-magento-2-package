@@ -35,6 +35,9 @@
             "visitor" : {
                 "name" : "<?=  $escaper->escapeJs($customer_details['name']); ?>",
                 "email" : "<?= $escaper->escapeJs($customer_details['email']); ?>"
+                <?php if ($customer_details['hash'] !== null): ?>
+                    , "hash" : "<?= $escaper->escapeJs($customer_details['hash']); ?>"
+                <?php endif; ?>
             }
         }
     }

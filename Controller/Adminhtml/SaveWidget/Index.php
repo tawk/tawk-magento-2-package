@@ -20,9 +20,14 @@ namespace Tawk\Widget\Controller\Adminhtml\SaveWidget;
 
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Exception\LocalizedException;
+
 use Psr\Log\LoggerInterface;
 use Tawk\Widget\Model\WidgetFactory;
 use Tawk\Widget\Helper\StringUtil;
+use Tawk\Widget\Api\ConfigInterface;
+use Tawk\Widget\Exception\SaveWidgetException;
 
 class Index extends \Magento\Backend\App\Action
 {
@@ -62,6 +67,13 @@ class Index extends \Magento\Backend\App\Action
     protected $helper;
 
     /**
+     * Encryptor instance
+     *
+     * @var EncryptorInterface $encryptor
+     */
+    protected $encryptor;
+
+    /**
      * Constructor
      *
      * @param WidgetFactory $modelFactory Tawk.to Widget Model instance
@@ -69,13 +81,15 @@ class Index extends \Magento\Backend\App\Action
      * @param JsonFactory $resultJsonFactory Json Factory instance
      * @param LoggerInterface $logger PSR Logger
      * @param StringUtil $helper String util helper
+     * @param EncryptorInterface $encryptor Encryptor instance
      */
     public function __construct(
         WidgetFactory $modelFactory,
         Context $context,
         JsonFactory $resultJsonFactory,
         LoggerInterface $logger,
-        StringUtil $helper
+        StringUtil $helper,
+        EncryptorInterface $encryptor
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
@@ -83,6 +97,7 @@ class Index extends \Magento\Backend\App\Action
         $this->modelWidgetFactory = $modelFactory->create();
         $this->request = $this->getRequest();
         $this->helper = $helper;
+        $this->encryptor = $encryptor;
     }
 
     /**
@@ -106,13 +121,14 @@ class Index extends \Magento\Backend\App\Action
         }
 
         $alwaysdisplay = filter_var($this->request->getParam('alwaysdisplay'), FILTER_SANITIZE_NUMBER_INT);
-        $excludeurl = $this->request->getParam('excludeurl');
+        $excludeurl = $this->helper->stripTagsandQuotes($this->request->getParam('excludeurl'));
         $donotdisplay = filter_var($this->request->getParam('donotdisplay'), FILTER_SANITIZE_NUMBER_INT);
-        $includeurl = $this->request->getParam('includeurl');
+        $includeurl = $this->helper->stripTagsAndQuotes($this->request->getParam('includeurl'));
         $enableVisitorRecognition = filter_var(
             $this->request->getParam('enableVisitorRecognition'),
             FILTER_SANITIZE_NUMBER_INT
         );
+        $jsApiKey = $this->helper->stripTagsandQuotes($this->request->getParam('jsApiKey'));
 
         $model = $this->modelWidgetFactory->loadByForStoreId($storeId);
 
@@ -134,8 +150,46 @@ class Index extends \Magento\Backend\App\Action
 
         $model->setEnableVisitorRecognition($enableVisitorRecognition);
 
+        try {
+            $this->setJsApiKey($model, $jsApiKey);
+        } catch (LocalizedException $e) {
+            if ($e instanceof SaveWidgetException) {
+                return $response->setData(['success' => false, 'message' => $e->getMessage()]);
+            }
+
+            return $response->setData(['success' => false, 'message' => 'An error occurred while saving the widget']);
+        }
+
+        $model->setConfigVersion($model->getConfigVersion() + 1);
+
         $model->save();
 
         return $response->setData(['success' => true]);
+    }
+
+    /**
+     * Sets the JS API key for the widget.
+     *
+     * @param \Tawk\Widget\Model\Widget $model The widget model
+     * @param string $jsApiKey The JS API key
+     * @return void
+     */
+    private function setJsApiKey($model, $jsApiKey)
+    {
+        if ($jsApiKey === ConfigInterface::JS_API_KEY_NO_CHANGE) {
+            return;
+        }
+
+        if ($jsApiKey === '') {
+            return $model->setJsApiKey(null);
+        }
+
+        $jsApiKey = trim($jsApiKey);
+
+        if (strlen($jsApiKey) !== 40) {
+            throw new SaveWidgetException(__('Invalid API key'));
+        }
+
+        return $model->setJsApiKey($this->encryptor->encrypt($jsApiKey));
     }
 }

@@ -3,9 +3,9 @@ define([], function () {
 
     return function (config) {
         var visitor = config.visitor,
-        embedUrl = config.embedUrl,
-        /* eslint-disable-next-line no-unused-vars */
-        Tawk_LoadStart = new Date();
+            embedUrl = config.embedUrl,
+            /* eslint-disable-next-line no-unused-vars */
+            Tawk_LoadStart = new Date();
 
         window.Tawk_API = window.Tawk_API || {};
 
@@ -14,6 +14,10 @@ define([], function () {
                 name : visitor.name,
                 email : visitor.email
             };
+
+            if (visitor.hash) {
+                window.Tawk_API.visitor.hash = visitor.hash;
+            }
         }
 
         (function () {

@@ -20,9 +20,11 @@ namespace Tawk\Widget\Controller\Adminhtml\StoreWidget;
 
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
+
 use Psr\Log\LoggerInterface;
 use Tawk\Widget\Model\WidgetFactory;
 use Tawk\Widget\Helper\StringUtil;
+use Tawk\Widget\Api\ConfigInterface;
 
 class Index extends \Magento\Backend\App\Action
 {
@@ -96,7 +98,8 @@ class Index extends \Magento\Backend\App\Action
      *   excludeurl: string,
      *   donotdisplay: int,
      *   includeurl: string,
-     *   enableVisitorRecognition: int
+     *   enableVisitorRecognition: int,
+     *   jsApiKey: string
      * }
      */
     public function execute()
@@ -126,6 +129,11 @@ class Index extends \Magento\Backend\App\Action
 
         $enableVisitorRecognition = $model->getEnableVisitorRecognition();
 
+        $jsApiKey = $model->getJsApiKey();
+        if (!empty($jsApiKey)) {
+            $jsApiKey = ConfigInterface::JS_API_KEY_NO_CHANGE;
+        }
+
         return $response->setData([
             'success' => true,
             'pageid' => $pageId,
@@ -134,7 +142,8 @@ class Index extends \Magento\Backend\App\Action
             'excludeurl' => $excludeurl,
             'donotdisplay' => $donotdisplay,
             'includeurl' => $includeurl,
-            'enableVisitorRecognition' => $enableVisitorRecognition
+            'enableVisitorRecognition' => $enableVisitorRecognition,
+            'jsApiKey' => $jsApiKey
         ]);
     }
 }

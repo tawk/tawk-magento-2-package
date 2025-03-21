@@ -5,6 +5,7 @@ xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/et
 		<constraint xsi:type="primary" referenceId="PRIMARY">
 			<column name="id"/>
 		</constraint>
+		<column name="config_version" xsi:type="int" unsigned="true" nullable="false" default="0" comment="Config version"/>
 		<column name="for_store_id" xsi:type="int" unsigned="true" nullable="false" comment="Store View ID"/>
 		<column name="page_id" xsi:type="varchar" length="255" nullable="true" comment="Tawk.to Page ID"/>
 		<column name="widget_id" xsi:type="varchar" length="255" nullable="true" comment="Tawk.to Widget ID"/>
@@ -18,5 +19,6 @@ xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/et
 			comment="Comma-separated list of url patterns where widget should be displayed"/>
 		<column name="enable_visitor_recognition" xsi:type="smallint" unsigned="true" nullable="false" default="1"
 			comment="Enable visitor recognition feature"/>
+		<column name="js_api_key" xsi:type="text" nullable="true" comment="JS API key"/>
 	</table>
 </schema>
