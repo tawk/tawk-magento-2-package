@@ -176,7 +176,12 @@ class Embed extends Template
 
         $customerSession = $this->modelSessionFactory->getCustomer();
 
-        $hash = $this->getVisitorHash($customerSession->getEmail());
+        $hash = null;
+        try {
+            $hash = $this->getVisitorHash($customerSession->getEmail());
+        } catch (LocalizedException $e) {
+            error_log($e->getMessage());
+        }
 
         return [
             'name'  => $customerSession->getName(),
@@ -205,11 +210,13 @@ class Embed extends Template
             }
         }
 
-        try {
-            $jsApiKey = $this->decryptJsApiKey($this->model->getJsApiKey());
-        } catch (LocalizedException $e) {
-            return '';
+        $encryptedJsApiKey = $this->model->getJsApiKey();
+
+        if (empty($encryptedJsApiKey)) {
+            return null;
         }
+
+        $jsApiKey = $this->encryptor->decrypt($encryptedJsApiKey);
 
         $hash = hash_hmac('sha256', $email, $jsApiKey);
 
@@ -220,24 +227,6 @@ class Embed extends Template
         ]);
 
         return $hash;
-    }
-
-    /**
-     * Retrieve JS API key
-     *
-     * @param string $js_api_key Encrypted JS API key
-     * @return string
-     * @throws \Exception error retrieving JS API key
-     */
-    private function decryptJsApiKey(string $js_api_key)
-    {
-        if (empty($js_api_key)) {
-            throw new LocalizedException(__('JS API key is empty'));
-        }
-
-        $key = $this->encryptor->decrypt($js_api_key);
-
-        return $key;
     }
 
     /**
